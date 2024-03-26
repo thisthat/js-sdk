@@ -24,7 +24,7 @@ type ReactFlagEvaluationOptions = {
   updateOnConfigurationChanged?: boolean,
   /**
    * Update the component when the OpenFeature context changes.
-   * Set to false to prevent components from re-rendering when attributes which 
+   * Set to false to prevent components from re-rendering when attributes which
    * may be factors in flag evaluation change.
    * Defaults to true.
    */
@@ -188,7 +188,7 @@ function attachHandlersAndResolve<T extends FlagValue>(flagKey: string, defaultV
       client.removeHandler(ProviderEvents.Reconciling, suspendRef);
     };
   }, []);
-  
+
   useEffect(() => {
     if (defaultedOptions.updateOnConfigurationChanged) {
       // update when the provider configuration changes
@@ -212,7 +212,7 @@ function attachHandlersAndResolve<T extends FlagValue>(flagKey: string, defaultV
 function suspend(client: Client, updateState: Dispatch<SetStateAction<object | undefined>>, ...resumeEvents: ProviderEvents[]) {
 
   let suspendResolver: () => void;
-  
+
   const suspendPromise = new Promise<void>((resolve) => {
     suspendResolver = () => {
       resolve();
@@ -250,7 +250,7 @@ function suspenseWrapper <T>(promise: Promise<T>) {
     }
   );
 
-  return () => {
+  const res = () => {
     switch (status) {
       case SuspendState.Pending:
         throw suspended;
@@ -262,4 +262,10 @@ function suspenseWrapper <T>(promise: Promise<T>) {
         throw new Error('Suspending promise is in an unknown state.');
     }
   };
+  try {
+    return res();
+  } catch (e) {
+    return e;
+  }
+
 };
